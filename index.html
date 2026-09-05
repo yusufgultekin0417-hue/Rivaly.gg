@@ -1,1 +1,426 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rivaly | Oyuncunu Bul</title>
 
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #080b12;
+      color: white;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 20px;
+      border-bottom: 1px solid #202635;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .logo span {
+      color: #7c5cff;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 35px 18px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 35px 0;
+    }
+
+    .hero h1 {
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: #9ca5b7;
+    }
+
+    .games {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .game {
+      background: #111621;
+      border: 1px solid #252c3b;
+      padding: 25px;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+
+    .game:hover {
+      border-color: #7c5cff;
+    }
+
+    .game h2 {
+      margin-bottom: 8px;
+    }
+
+    .game p {
+      color: #9ca5b7;
+    }
+
+    .create {
+      margin-top: 30px;
+      background: #111621;
+      padding: 25px;
+      border-radius: 15px;
+      border: 1px solid #252c3b;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      background: #080b12;
+      color: white;
+      border: 1px solid #30384a;
+      border-radius: 9px;
+      font-size: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .createButton {
+      width: 100%;
+      margin-top: 15px;
+      background: #7c5cff;
+      color: white;
+    }
+
+    .rooms {
+      margin-top: 35px;
+    }
+
+    .room {
+      background: #111621;
+      border: 1px solid #252c3b;
+      padding: 20px;
+      margin-top: 12px;
+      border-radius: 14px;
+    }
+
+    .roomTop {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .tag {
+      color: #9ca5b7;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .count {
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .roomButtons {
+      display: flex;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .join {
+      background: #7c5cff;
+      color: white;
+      flex: 1;
+    }
+
+    .leave {
+      background: #252c3b;
+      color: white;
+    }
+
+    .full {
+      opacity: .5;
+    }
+
+    @media(max-width:600px) {
+      .games {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Rivaly<span>.</span></div>
+  <div>🎮 Oda Bul</div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <h1>Takımını. Rakibini. Bul.</h1>
+    <p>Valorant ve eFootball oyuncularıyla saniyeler içinde eşleş.</p>
+  </section>
+
+  <section class="games">
+    <div class="game" onclick="selectGame('Valorant')">
+      <h2>🎯 Valorant</h2>
+      <p>Takım arkadaşlarını bul ve lobini doldur.</p>
+    </div>
+
+    <div class="game" onclick="selectGame('eFootball')">
+      <h2>⚽ eFootball</h2>
+      <p>Oda oluştur ve VS atacak rakip bul.</p>
+    </div>
+  </section>
+
+  <section class="create">
+    <h2>Oda Oluştur</h2>
+
+    <select id="game">
+      <option>Valorant</option>
+      <option>eFootball</option>
+    </select>
+
+    <input
+      id="username"
+      placeholder="Oyun adın / Riot ID"
+      maxlength="40"
+    >
+
+    <input
+      id="roomInfo"
+      placeholder="Oda ID veya kısa açıklama"
+      maxlength="100"
+    >
+
+    <select id="maxPlayers">
+      <option value="2">2 Kişilik</option>
+      <option value="3">3 Kişilik</option>
+      <option value="4">4 Kişilik</option>
+      <option value="5" selected>5 Kişilik</option>
+    </select>
+
+    <button class="createButton" onclick="createRoom()">
+      Oda Oluştur
+    </button>
+  </section>
+
+  <section class="rooms">
+    <h2>🔥 Aktif Odalar</h2>
+    <div id="roomList"></div>
+  </section>
+
+</main>
+
+<script>
+  let rooms = [];
+
+  function selectGame(game) {
+    document.getElementById("game").value = game;
+    document.querySelector(".create").scrollIntoView({
+      behavior: "smooth"
+    });
+  }
+
+  function detectGame(text, selectedGame) {
+    const t = text.toLowerCase();
+
+    const pesWords = [
+      "pes",
+      "efootball",
+      "e-football",
+      "oda id",
+      "vs"
+    ];
+
+    const valorantWords = [
+      "valorant",
+      "riot",
+      "gold",
+      "silver",
+      "bronze",
+      "diamond",
+      "ascendant",
+      "immortal",
+      "duelist",
+      "sentinel"
+    ];
+
+    let pes = 0;
+    let val = 0;
+
+    pesWords.forEach(word => {
+      if (t.includes(word)) pes++;
+    });
+
+    valorantWords.forEach(word => {
+      if (t.includes(word)) val++;
+    });
+
+    if (pes > val) return "eFootball";
+    if (val > pes) return "Valorant";
+
+    return selectedGame;
+  }
+
+  function createRoom() {
+    const selectedGame =
+      document.getElementById("game").value;
+
+    const username =
+      document.getElementById("username").value.trim();
+
+    const info =
+      document.getElementById("roomInfo").value.trim();
+
+    const max =
+      Number(document.getElementById("maxPlayers").value);
+
+    if (!username || !info) {
+      alert("Oyun adı ve oda bilgisini doldur.");
+      return;
+    }
+
+    const detectedGame =
+      detectGame(info, selectedGame);
+
+    if (detectedGame !== selectedGame) {
+      alert(
+        "🤖 Sistem bunun " +
+        detectedGame +
+        " odası olduğunu algıladı ve doğru bölüme taşıdı."
+      );
+    }
+
+    rooms.unshift({
+      game: detectedGame,
+      username: username,
+      info: info,
+      players: 1,
+      max: max
+    });
+
+    document.getElementById("username").value = "";
+    document.getElementById("roomInfo").value = "";
+
+    renderRooms();
+  }
+
+  function joinRoom(index) {
+    const room = rooms[index];
+
+    if (room.players < room.max) {
+      room.players++;
+    }
+
+    renderRooms();
+  }
+
+  function leaveRoom(index) {
+    const room = rooms[index];
+
+    if (room.players > 1) {
+      room.players--;
+    }
+
+    renderRooms();
+  }
+
+  function renderRooms() {
+    const list = document.getElementById("roomList");
+
+    list.innerHTML = "";
+
+    rooms.forEach((room, index) => {
+      const full = room.players >= room.max;
+
+      const div = document.createElement("div");
+
+      div.className = "room" + (full ? " full" : "");
+
+      div.innerHTML = `
+        <div class="roomTop">
+
+          <div>
+            <div class="tag">
+              ${room.game}
+            </div>
+
+            <h3>${escapeHTML(room.username)}</h3>
+
+            <p>
+              ${escapeHTML(room.info)}
+            </p>
+          </div>
+
+          <div class="count">
+            ${room.players}/${room.max}
+          </div>
+
+        </div>
+
+        <div class="roomButtons">
+
+          <button
+            class="join"
+            onclick="joinRoom(${index})"
+            ${full ? "disabled" : ""}
+          >
+            ${full ? "🔒 Oda Dolu" : "🎮 Katıl"}
+          </button>
+
+          <button
+            class="leave"
+            onclick="leaveRoom(${index})"
+          >
+            Ayrıl
+          </button>
+
+        </div>
+      `;
+
+      list.appendChild(div);
+    });
+  }
+
+  function escapeHTML(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>
